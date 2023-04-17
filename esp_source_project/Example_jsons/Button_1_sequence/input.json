@@ -1,0 +1,25 @@
+{
+    "install":[
+        "button",
+        "LED"
+    ],
+    "event_generators":[
+      "button"
+    ],
+    "sequence":[
+      {
+        "event":"BUTTON_DETECTED",
+        "number_of_actions":2,
+        "action":[
+          {
+            "action on":"LED",
+            "action":"LED_ON"
+          },
+          {
+            "action on":"MQTT",
+            "action":"BUTTON_DETECTED"
+          }
+        ]
+      }
+    ]
+  }

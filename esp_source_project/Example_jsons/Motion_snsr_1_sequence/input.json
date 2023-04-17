@@ -1,0 +1,25 @@
+{
+    "install":[
+        "motion_snsr",
+        "LED"
+    ],
+    "event_generators":[
+      "motion_snsr"
+    ],
+    "sequence":[
+      {
+        "event":"MOTION_DETECTED",
+        "number_of_actions":2,
+        "action":[
+          {
+            "action on":"LED",
+            "action":"LED_ON"
+          },
+          {
+            "action on":"MQTT",
+            "action":"MOTION_DETECTED"
+          }
+        ]
+      }
+    ]
+  }
