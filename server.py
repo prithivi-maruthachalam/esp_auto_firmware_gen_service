@@ -106,11 +106,15 @@ def run_code_generation(req_id, req_base, json_file_path, esp_proj_src):
     # Send MQTT message with public url
     file_url = f'{S3_BUCKET_BASE_URL}/{OUT_FILENAME}'
     log.debug(f'Uploaded file {file_url}')
+    pub_data = dict()
+    pub_data['Command for'] = 1
+    pub_data['payload'] = file_url
+    pub_data = json.dumps(pub_data)
     iot_client.publish(
         topic=OTA_TOPIC,
         contentType='OTA location',
         payloadFormatIndicator='UTF8_DATA',
-        payload=file_url)
+        payload=pub_data)
     log.info(f'Published to MQTT')
 
 
