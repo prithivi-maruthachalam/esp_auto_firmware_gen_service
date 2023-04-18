@@ -12,13 +12,17 @@ import threading
 import atexit
 import shutil
 import logging
+import boto3
 
 '''
     Application Constants
 '''
 BUILDS_BASE_PATH = "/tmp/builds"
 OUT_FILENAME = "Auto_Build.bin"
-IDF_PATH = "/home/prithivi/denbu/embedded/esp/esp-idf"
+IDF_PATH = "/home/ubuntu/esp/esp-idf"
+BUCKET = "denbu-ota-files"
+OTA_TOPIC = "esp/command"
+S3_BUCKET_BASE_URL = "https://denbu-ota-files.s3.ap-south-1.amazonaws.com"
 
 # Setup logging
 logging.basicConfig(level=logging.DEBUG)
@@ -28,6 +32,19 @@ server_app = Flask(__name__)
 
 # Create the Builds Base Directory if it doesn't exist
 os.makedirs(BUILDS_BASE_PATH, exist_ok=True)
+
+'''
+    The following is expected that this is run in an environment 
+    with AWS Credentials already present. (aws-cli for example). 
+    Boto3 will automatically use the credentials from that environment.
+'''
+
+# Get reference to s3 bucket
+s3 = boto3.resource("s3")
+ota_bucket = s3.Bucket(BUCKET)
+
+# Get reference to IoT DataPlane client
+iot_client = boto3.client('iot-data')
 
 
 def run_code_generation(req_id, req_base, json_file_path, esp_proj_src):
@@ -75,6 +92,24 @@ def run_code_generation(req_id, req_base, json_file_path, esp_proj_src):
     # Delete source files
     shutil.rmtree(esp_proj_src)
     log.info('Deleted esp source files')
+
+    # Upload firmware binary to s3
+    try:
+        log.info(f'Uploading {binary_file_path_new} to s3')
+        ota_bucket.upload_file(os.path.abspath(binary_file_path_new), f'{req_id}/{OUT_FILENAME}')
+        log.info(f'Uploaded to s3')
+    except:
+        log.error('Error uploading to s3')
+        return
+
+    # Send MQTT message with public url
+    file_url = f'{S3_BUCKET_BASE_URL}/{req_id}/{OUT_FILENAME}'
+    log.debug(f'Uploaded file {file_url}')
+    iot_client.publish(
+            topic=OTA_TOPIC,
+            contentType='OTA location',
+            payloadFormatIndicator='UTF8_DATA',
+            payload=file_url)
 
 
 @server_app.route("/gen_code", methods=['POST'])

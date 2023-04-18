@@ -1,2 +1,0 @@
-Flask==0.12.5
-waitress==2.1.2
