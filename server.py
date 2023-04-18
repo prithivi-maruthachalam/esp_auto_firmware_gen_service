@@ -96,7 +96,8 @@ def run_code_generation(req_id, req_base, json_file_path, esp_proj_src):
     # Upload firmware binary to s3
     try:
         log.info(f'Uploading {binary_file_path_new} to s3')
-        ota_bucket.upload_file(os.path.abspath(binary_file_path_new), f'{req_id}/{OUT_FILENAME}')
+        ota_bucket.upload_file(os.path.abspath(
+            binary_file_path_new), f'{req_id}/{OUT_FILENAME}')
         log.info(f'Uploaded to s3')
     except:
         log.error('Error uploading to s3')
@@ -106,10 +107,11 @@ def run_code_generation(req_id, req_base, json_file_path, esp_proj_src):
     file_url = f'{S3_BUCKET_BASE_URL}/{req_id}/{OUT_FILENAME}'
     log.debug(f'Uploaded file {file_url}')
     iot_client.publish(
-            topic=OTA_TOPIC,
-            contentType='OTA location',
-            payloadFormatIndicator='UTF8_DATA',
-            payload=file_url)
+        topic=OTA_TOPIC,
+        contentType='OTA location',
+        payloadFormatIndicator='UTF8_DATA',
+        payload=file_url)
+    log.info(f'Published to MQTT')
 
 
 @server_app.route("/gen_code", methods=['POST'])

@@ -19,4 +19,5 @@
         - Upload to s3
         - Publish to AWS IoT Core Data Plane
 - Flask by default, listens on port **5000**. Make sure that the inbound rules for the ec2 instance allow custom traffic on this port from any IP address.
+- Edit the **server.py** file and change the application constants to match you setup.
 - Run the server - `python server.py`
