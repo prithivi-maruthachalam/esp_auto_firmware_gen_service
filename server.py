@@ -19,7 +19,7 @@ import boto3
 '''
 BUILDS_BASE_PATH = "/tmp/builds"
 OUT_FILENAME = "Auto_Build.bin"
-IDF_PATH = "/home/ubuntu/esp/esp-idf"
+IDF_PATH = "/home/prithivi/denbu/embedded/esp/esp-idf"
 BUCKET = "denbu-ota-files"
 OTA_TOPIC = "esp/command"
 S3_BUCKET_BASE_URL = "https://denbu-ota-files.s3.ap-south-1.amazonaws.com"

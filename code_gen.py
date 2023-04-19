@@ -22,7 +22,7 @@ config = json.load(inputFile)
 installModules = config["install"]
 event_generators = config["event_generators"]
 
-applicationHeader = open("application.h", "w")
+applicationHeader = open(os.path.join(args.out, "application.h"), "w")
 
 applicationHeader.write("#ifndef APPLICATION\n")
 applicationHeader.write("#define APPLICATION\n")
@@ -43,7 +43,7 @@ applicationHeader.close()
 
 print(config["sequence"])
 
-applicationSource = open("application.c", "w")
+applicationSource = open(os.path.join(args.out, "application.c"), "w")
 
 applicationSource.write("#include \"application.h\"\n\n")
 applicationSource.write("void start_application()\n{\n")
@@ -95,7 +95,7 @@ applicationSource.write("\t\t\tdefault:\n\t\t\t\tbreak;\n\t\t}\n\t}\n}")
 
 applicationSource.close()
 
-configFile = open("config.h", "w")
+configFile = open(os.path.join(args.out, "config.h"), "w")
 
 configFile.write("#ifndef CONFIG\n")
 configFile.write("#define CONFIG\n\n")
@@ -106,7 +106,7 @@ configFile.write("\n#endif /* CONFIG */")
 configFile.close()
 
 # write CMakeLists
-cmakefile = open("CMakeLists.txt", "w")
+cmakefile = open(os.path.join(args.out, "CMakeLists.txt"), "w")
 
 # write mandatory files
 cmakefile.write(
