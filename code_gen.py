@@ -22,7 +22,7 @@ config = json.load(inputFile)
 installModules = config["install"]
 event_generators = config["event_generators"]
 
-applicationHeader = open(os.path.join(args.out, "application.h"), "w")
+applicationHeader = open("application.h", "w")
 
 applicationHeader.write("#ifndef APPLICATION\n")
 applicationHeader.write("#define APPLICATION\n")
@@ -43,7 +43,7 @@ applicationHeader.close()
 
 print(config["sequence"])
 
-applicationSource = open(os.path.join(args.out, "application.c"), "w")
+applicationSource = open("application.c", "w")
 
 applicationSource.write("#include \"application.h\"\n\n")
 applicationSource.write("void start_application()\n{\n")
@@ -62,12 +62,15 @@ for module in event_generators:
     for sub_module in installModules:
         applicationSource.write("\tstr_"+sub_module +
                                 "_event_t " + sub_module + "_msg;\n")
+
+applicationSource.write("\tmqttData_str_t mqttData_e;\n")
+
+for module in event_generators:
     applicationSource.write("\twhile(1)\n\t{\n")
     applicationSource.write(
         "\t\twhile(!xQueueReceive(q_"+module+"_event,&"+module+"_msg,portMAX_DELAY));\n")
     applicationSource.write("\t\tswitch(" + module + "_msg.msg_id)\n\t\t{\n")
 
-mqtt_instance_count = 0
 
 sequence = config["sequence"]
 
@@ -77,12 +80,8 @@ for sequence_num in range(len(sequence)):
     for count in range(sequence[sequence_num]["number_of_actions"]):
         action_on = sequence[sequence_num]["action"][count]["action on"]
         if (action_on == 'MQTT'):
-            if (mqtt_instance_count < 1):
-                applicationSource.write("\t\t\t\tmqttData_str_t mqttData_e;\n")
-                mqtt_instance_count = mqtt_instance_count + 1
-            for module in event_generators:
-                applicationSource.write(
-                    "\t\t\t\tmqttData_e.data = " + module + "_msg.data" + ";\n")
+            applicationSource.write(
+                "\t\t\t\tmqttData_e.data = " + module + "_msg.data" + ";\n")
             applicationSource.write(
                 "\t\t\t\txQueueSend(mqttData_Queue, &mqttData_e , (TickType_t)0 );\n")
         else:
@@ -96,7 +95,7 @@ applicationSource.write("\t\t\tdefault:\n\t\t\t\tbreak;\n\t\t}\n\t}\n}")
 
 applicationSource.close()
 
-configFile = open(os.path.join(args.out, "config.h"), "w")
+configFile = open("config.h", "w")
 
 configFile.write("#ifndef CONFIG\n")
 configFile.write("#define CONFIG\n\n")
@@ -107,7 +106,7 @@ configFile.write("\n#endif /* CONFIG */")
 configFile.close()
 
 # write CMakeLists
-cmakefile = open(os.path.join(args.out, "CMakeLists.txt"), "w")
+cmakefile = open("CMakeLists.txt", "w")
 
 # write mandatory files
 cmakefile.write(
