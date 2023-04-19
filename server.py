@@ -108,7 +108,7 @@ def run_code_generation(req_id, req_base, json_file_path, esp_proj_src):
     log.debug(f'Uploaded file {file_url}')
     pub_data = dict()
     pub_data['Command for'] = 1
-    pub_data['payload'] = file_url
+    pub_data['payload'] = "OTA"
     pub_data = json.dumps(pub_data)
     iot_client.publish(
         topic=OTA_TOPIC,
